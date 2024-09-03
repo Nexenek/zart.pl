@@ -5,7 +5,7 @@ To coś jest dosłownie tak okropne że ja się poddaje
 # Jak tego używać?
 Well no zacznijmy od pobrania pythona. Ja osobiście używałem wersji `3.12.5`
 
-Pythona możecie pobrać z oficjalnej strony, odpowiednie instrukcje dla waszego systemu operacyjnego napewo tez tam są.
+Pythona możecie pobrać z oficjalnej strony, odpowiednie instrukcje dla waszego systemu operacyjnego napewo też tam są.
 
 Kiedy już macie pythona to teraz stwórzmy sobie wirtualne środowisko, tak aby nie mieć żadnych dziwnych konfliktów:
 
@@ -82,4 +82,6 @@ venv\Scripts\activate
 
 i po uruchomieniu jednej z tych komend możecie znowu używać skryptu
 
-*note: nie testowałem nic z tego na Windowsie 
+---
+
+*note: nie testowałem nic z tego na Windowsie*
