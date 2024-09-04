@@ -17,7 +17,7 @@ source ./venv/bin/activate
 Na Windowsie:
 ```cmd
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 teraz możemy zainstalować wymagane biblioteki:
 
@@ -80,7 +80,7 @@ source ./venv/bin/activate
 ```
 Windows:
 ```
-venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 
 i po uruchomieniu jednej z tych komend możecie znowu używać skryptu
