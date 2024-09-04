@@ -1,5 +1,5 @@
 # A takie gówno do zabawy z vulcan api lol
-To coś jest dosłownie tak okropne że ja się poddaje
+**Teraz działa z różnymi kluczami!**
 
 ---
 # Jak tego używać?
@@ -47,13 +47,16 @@ that's it
 
 ### Uruchamianie skryptu
 
-Zanim tak po prostu uruchomicie skrypt wejdzcie do pliku `literaljoke.py` i podajcie swoje `hasło` i `login` w *odpowiednie miejsce na górze pliku*.
+Zanim tak po prostu uruchomicie skrypt wejdzcie do pliku `literaljoke.py` i podajcie swoje `hasło` i `login` w *odpowiednie miejsce na górze pliku*. Możecie też zmienić daty `od` i `do` aby uzyskać plan lekcji z innego okresu
 
 ```python
 ################################### Dane logowania #######################################
 
 login = 'LOGIN_DO_EDUVULCAN'
 haselko = 'HASŁO_DO_EDUVULCAN'
+
+dataOd='2024-09-01T22:00:00.000Z'
+dataDo='2024-09-08T21:59:59.999Z'
 
 ################################### Dane logowania #######################################
 ```

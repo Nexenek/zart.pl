@@ -4,21 +4,31 @@ from pathlib import Path
 import requests
 from playwright.async_api import async_playwright
 import pandas as pd
+import time
+import re
 
 # Ścieżka do pliku z cookies
 cookies_file = "cookies.json"
-
-# URL-e do logowania, tablicy i API planu lekcji
-login_url = 'https://eduvulcan.pl/logowanie'
-dashboard_url = 'https://uczen.eduvulcan.pl/powiatpoznanski/App/TVRjMk5USXRORFE0T0MweExUVT0/tablica'
-plan_lekcji_url = 'https://uczen.eduvulcan.pl/powiatpoznanski/api/79ad9207-6132-427d-bbfa-62a7cff7735f?key=TVRjMk5USXRORFE0T0MweExUVT0&dataOd=2024-09-01T22:00:00.000Z&dataDo=2024-09-08T21:59:59.999Z&zakresDanych=2'
+key_file = "key.txt"
 
 ################################### Dane logowania #######################################
 
 login = 'LOGIN_DO_EDUVULCAN'
 haselko = 'HASŁO_DO_EDUVULCAN'
 
+dataOd='2024-09-01T22:00:00.000Z'
+dataDo='2024-09-08T21:59:59.999Z'
+
 ################################### Dane logowania #######################################
+
+# URL-e do logowania, tablicy i API planu lekcji
+login_url = 'https://eduvulcan.pl/logowanie'
+
+def gen_link(accklucz, linkname):
+    if linkname == 'plan_lekcji_url':
+        return f'https://uczen.eduvulcan.pl/powiatpoznanski/api/79ad9207-6132-427d-bbfa-62a7cff7735f?key={accklucz}&dataOd={dataOd}&dataDo={dataDo}&zakresDanych=2'
+    elif linkname == 'dashboard_url':
+        return f'https://uczen.eduvulcan.pl/powiatpoznanski/App/{accklucz}/tablica'
 
 def load_cookies(path):
     if Path(path).exists():
@@ -26,23 +36,33 @@ def load_cookies(path):
             return json.load(file)
     return None
 
+def load_key(path):
+    if Path(path).exists():
+        with open(path, "r") as file:
+            return file.read()
+    return None
+
 def save_cookies(cookies, path):
     with open(path, "w") as file:
         json.dump(cookies, file)
+
+def save_key(key, path):
+    with open(path, "w") as file:
+        file.write(key)
 
 def get_headers(cookies):
     cookies_str = '; '.join([f'{cookie["name"]}={cookie["value"]}' for cookie in cookies])
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0',
-        'Referer': dashboard_url,
+        'Referer': gen_link(load_key(key_file), 'dashboard_url'),
         'Cookie': cookies_str
     }
     return headers
 
 def check_existing_cookies(cookies):
     headers = get_headers(cookies)
-    response = requests.get(plan_lekcji_url, headers=headers)
+    response = requests.get(gen_link(load_key(key_file), 'plan_lekcji_url'), headers=headers)
 
     if response.status_code == 200:
         try:
@@ -69,17 +89,22 @@ async def login_and_fetch_schedule(playwright):
 
     await page.wait_for_url("https://eduvulcan.pl/")
     await page.click("a.connected-account.access-row.flex-grow-1")
-    await page.wait_for_url(dashboard_url)
+    
+    await page.wait_for_url("**/tablica")
 
-    if "/tablica" in page.url:
-        print("Zalogowano pomyślnie!")
+    try:
         cookies = await context.cookies()
         save_cookies(cookies, cookies_file)
-    else:
-        raise Exception("Logowanie nie powiodło się!")
+        match = re.search(r'/([A-Za-z0-9]+)\/tablica', page.url)
+        save_key(match.group(1), key_file)
+        print("Klucz: " + match.group(1))
+        print("Zalogowano pomyślnie!")
+    except Exception as e:
+        print("Logowanie nie powiodło się.")
+        raise Exception(e)
 
     # Pobierz plan lekcji z API
-    response = await page.request.get(plan_lekcji_url)
+    response = await page.request.get(gen_link(load_key(key_file), 'plan_lekcji_url'), headers=get_headers(cookies))
     data = await response.json()
 
     await browser.close()
